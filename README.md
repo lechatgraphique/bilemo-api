@@ -1,2 +1,11 @@
-# bilemo-api
-BileMo est une entreprise offrant toute une sélection de téléphones mobiles haut de gamme. Exposiez un certain nombre d’API pour que les applications des autres plateformes web puissent effectuer des opérations
+# P7-BileMo API
+
+Work in progress ...
+
+Création d'une API Rest pour BileMo, une entreprise de vente de téléphone.
+
+## Environnement utilisé durant le développement
+* Symfony 5
+* Composer 1.9.2
+* PHP 7.4.7
+* MySQL 8.0.18
