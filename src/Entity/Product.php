@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,6 +46,17 @@ class Product
      * @var DateTimeInterface|null
      */
     private ?DateTimeInterface $createdAt = null;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=client::class, inversedBy="products")
+     * @var Client|null
+     */
+    private ?Client $clients = null;
+
+    public function __construct()
+    {
+        $this->clients = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -125,6 +138,40 @@ class Product
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|client[]
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    /**
+     * @param client $client
+     * @return $this
+     */
+    public function addClient(client $client): self
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients[] = $client;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param client $client
+     * @return $this
+     */
+    public function removeClient(client $client): self
+    {
+        if ($this->clients->contains($client)) {
+            $this->clients->removeElement($client);
+        }
 
         return $this;
     }
