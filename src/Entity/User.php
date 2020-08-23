@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,28 +31,9 @@ class User
     private ?string $email = null;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @var array|null
+     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
      */
-    private ?array $roles = [];
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @var string|null
-     */
-    private ?string $password = null;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Client::class, mappedBy="user")
-     * @var Client|null
-     */
-    private ?Client $clients = null;
-
-
-    public function __construct()
-    {
-        $this->clients = new ArrayCollection();
-    }
+    private ?Client $client = null;
 
     /**
      * @return int|null
@@ -102,73 +81,21 @@ class User
         return $this;
     }
 
-    public function getRoles(): ?array
+    /**
+     * @return Client|null
+     */
+    public function getClient(): ?Client
     {
-        return $this->roles;
+        return $this->client;
     }
 
     /**
-     * @param string|null $roles
+     * @param Client|null $client
      * @return $this
      */
-    public function setRoles(?string $roles): self
+    public function setClient(?Client $client): self
     {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    /**
-     * @param string|null $password
-     * @return $this
-     */
-    public function setPassword(?string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Client[]
-     */
-    public function getClients(): Collection
-    {
-        return $this->clients;
-    }
-
-    /**
-     * @param Client $client
-     * @return $this
-     */
-    public function addClient(Client $client): self
-    {
-        if (!$this->clients->contains($client)) {
-            $this->clients[] = $client;
-            $client->addUser($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Client $client
-     * @return $this
-     */
-    public function removeClient(Client $client): self
-    {
-        if ($this->clients->contains($client)) {
-            $this->clients->removeElement($client);
-            $client->removeUser($this);
-        }
+        $this->client = $client;
 
         return $this;
     }
