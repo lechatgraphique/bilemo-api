@@ -6,11 +6,12 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
  */
-class Client
+class Client implements UserInterface
 {
     /**
      * @ORM\Id()
@@ -27,19 +28,27 @@ class Client
     private ?string $name = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="clients")
-     * @var Product|null
+     * @ORM\Column(type="string", length=255)
+     * @var string|null
      */
-    private ?Product $products = null;
+    private ?string $password = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity=user::class, inversedBy="clients")
-     * @var User|null
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="client")
      */
-    private ?User $user = null;
+    private ArrayCollection $users;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="clients")
+     */
+    private ArrayCollection $products;
+
+    /**
+     * Client constructor.
+     */
     public function __construct()
     {
+        $this->users = new ArrayCollection();
         $this->products = new ArrayCollection();
     }
 
@@ -60,12 +69,70 @@ class Client
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return $this
      */
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string|null $password
+     * @return $this
+     */
+    public function setPassword(?string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setClient($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getClient() === $this) {
+                $user->setClient(null);
+            }
+        }
 
         return $this;
     }
@@ -107,21 +174,34 @@ class Client
     }
 
     /**
-     * @return User|null
+     * @return void
      */
-    public function getUser(): ?User
+    public function getRoles()
     {
-        return $this->user;
+        // TODO: Implement getRoles() method.
     }
 
     /**
-     * @param User|null $user
-     * @return $this
+     * @return string|null
      */
-    public function setUser(?User $user): self
+    public function getSalt()
     {
-        $this->user = $user;
+        // TODO: Implement getSalt() method.
+    }
 
-        return $this;
+    /**
+     * @return string
+     */
+    public function getUsername()
+    {
+        // TODO: Implement getUsername() method.
+    }
+
+    /**
+     * @return mixed
+     */
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
     }
 }

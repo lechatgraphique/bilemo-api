@@ -6,8 +6,8 @@ use App\Repository\ProductRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -48,11 +48,13 @@ class Product
     private ?DateTimeInterface $createdAt = null;
 
     /**
-     * @ORM\ManyToMany(targetEntity=client::class, inversedBy="products")
-     * @var Client|null
+     * @ORM\ManyToMany(targetEntity=Client::class, inversedBy="products")
      */
-    private ?Client $clients = null;
+    private ArrayCollection $clients;
 
+    /**
+     * Product constructor.
+     */
     public function __construct()
     {
         $this->clients = new ArrayCollection();
@@ -126,16 +128,16 @@ class Product
     /**
      * @return DateTimeInterface|null
      */
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->createdAt;
     }
 
     /**
-     * @param DateTimeInterface|null $createdAt
+     * @param ?DateTimeInterface $createdAt
      * @return $this
      */
-    public function setCreatedAt(?\DateTimeInterface $createdAt): self
+    public function setCreatedAt(?DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 
@@ -143,7 +145,7 @@ class Product
     }
 
     /**
-     * @return Collection|client[]
+     * @return Collection|Client[]
      */
     public function getClients(): Collection
     {
@@ -151,10 +153,10 @@ class Product
     }
 
     /**
-     * @param client $client
+     * @param Client $client
      * @return $this
      */
-    public function addClient(client $client): self
+    public function addClient(Client $client): self
     {
         if (!$this->clients->contains($client)) {
             $this->clients[] = $client;
@@ -164,10 +166,10 @@ class Product
     }
 
     /**
-     * @param client $client
+     * @param Client $client
      * @return $this
      */
-    public function removeClient(client $client): self
+    public function removeClient(Client $client): self
     {
         if ($this->clients->contains($client)) {
             $this->clients->removeElement($client);
