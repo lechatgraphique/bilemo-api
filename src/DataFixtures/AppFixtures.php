@@ -28,6 +28,7 @@ class AppFixtures extends Fixture
         $hash = password_hash('123456', PASSWORD_BCRYPT);
         $client
             ->setName('BlablaPhone')
+            ->setEmail('blabla-phone@gmail.com')
             ->setPassword($hash);
 
         for ($i = 0; $i <= 10; $i++) {
