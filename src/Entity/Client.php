@@ -6,10 +6,13 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
+ * @UniqueEntity("email")
  */
 class Client implements UserInterface
 {
@@ -42,6 +45,12 @@ class Client implements UserInterface
      * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="clients")
      */
     private Collection $products;
+
+    /**
+     * @ORM\Column(name="email", type="string", length=255)
+     * @Assert\Email
+     */
+    private ?string $email;
 
     /**
      * Client constructor.
@@ -174,11 +183,11 @@ class Client implements UserInterface
     }
 
     /**
-     * @return void
+     * @return string[]
      */
     public function getRoles()
     {
-        // TODO: Implement getRoles() method.
+        return ['ROLE_USER'];
     }
 
     /**
@@ -194,7 +203,7 @@ class Client implements UserInterface
      */
     public function getUsername()
     {
-        // TODO: Implement getUsername() method.
+        return $this->email;
     }
 
     /**
@@ -203,5 +212,24 @@ class Client implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string|null $email
+     * @return $this
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
     }
 }
