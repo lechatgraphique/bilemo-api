@@ -50,7 +50,7 @@ class Product
     /**
      * @ORM\ManyToMany(targetEntity=Client::class, inversedBy="products")
      */
-    private ArrayCollection $clients;
+    private Collection $clients;
 
     /**
      * Product constructor.

@@ -36,12 +36,12 @@ class Client implements UserInterface
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="client")
      */
-    private ArrayCollection $users;
+    private Collection $users;
 
     /**
      * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="clients")
      */
-    private ArrayCollection $products;
+    private Collection $products;
 
     /**
      * Client constructor.
