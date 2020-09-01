@@ -1,0 +1,14 @@
+# Read the documentation: https://symfony.com/doc/master/bundles/FOSRestBundle/index.html
+fos_rest:
+  view:
+    formats: {json: true, xml: false, rss: false}
+    view_response_listener: true
+    mime_types:
+      json: ['application/json', 'application/json;version=1.0', 'application/json;version=2.0']
+  serializer:
+    serialize_null: true
+  body_converter:
+    enabled: true
+  format_listener:
+    rules:
+      - {path: '^/api', priorities: ['json'], fallback_format: 'json'}
