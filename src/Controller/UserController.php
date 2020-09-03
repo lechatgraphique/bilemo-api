@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,29 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class UserController extends AbstractController
 {
+    /**
+     * @Rest\Get(path="/api/users", name="api_users")
+     * @Rest\View(statusCode= 200, serializerGroups={"user"})
+     * @param UserRepository $userRepository
+     * @return User[]
+     */
+    public function users(UserRepository $userRepository)
+    {
+        return $userRepository->findAll();
+    }
+
+    /**
+     * @Rest\Get(path="/api/users/{id}", name="api_show_users")
+     * @Rest\View(statusCode= 200, serializerGroups={"user"})
+     * @param User $user
+     * @param UserRepository $userRepository
+     * @return string
+     */
+    public function show(User $user, UserRepository $userRepository)
+    {
+        return $userRepository->find($user);
+    }
+
     /**
      * @Rest\Post(path="/api/users", name="api_add_user")
      * @Rest\View(statusCode= 201, serializerGroups={"user"})

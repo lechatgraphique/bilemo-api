@@ -19,28 +19,28 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"list", "list_products"})
+     * @Groups({"product"})
      * @var int|null
      */
     private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list", "list_products"})
+     * @Groups({"product"})
      * @var string|null
      */
     private ?string $name = null;
 
     /**
      * @ORM\Column(type="text")
-     * @Groups({"list", "list_products"})
+     * @Groups({"product"})
      * @var string|null
      */
     private ?string $description = null;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list", "list_products"})
+     * @Groups({"product"})
      * @var string|null
      */
     private ?string $price = null;
@@ -48,7 +48,7 @@ class Product
     /**
      * @ORM\Column(type="datetime")
      * @Gedmo\Timestampable(on="create")
-     * @Groups({"list", "list_products"})
+     * @Groups({"product"})
      * @var DateTimeInterface|null
      */
     private ?DateTimeInterface $createdAt = null;
