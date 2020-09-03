@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @OA\Schema()
  */
 class User
 {
@@ -17,6 +19,7 @@ class User
      * @ORM\Column(type="integer")
      * @Groups({"user"})
      * @var int|null
+     * @OA\Property(type="integer")
      */
     private ?int $id = null;
 
@@ -24,6 +27,7 @@ class User
      * @ORM\Column(type="string", length=255)
      * @Groups({"user"})
      * @var string|null
+     * @OA\Property(type="string", nullable=true)
      */
     private ?string $username = null;
 
@@ -31,11 +35,14 @@ class User
      * @ORM\Column(type="string", length=255)
      * @Groups({"user"})
      * @var string|null
+     * @OA\Property(type="string", nullable=true)
      */
     private ?string $email = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
+     * @OA\Property(type="string", nullable=true)
+     *
      */
     private ?Client $client = null;
 

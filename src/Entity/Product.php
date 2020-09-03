@@ -9,9 +9,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @OA\Schema()
+ *
  */
 class Product
 {
@@ -21,6 +24,7 @@ class Product
      * @ORM\Column(type="integer")
      * @Groups({"product"})
      * @var int|null
+     * @OA\Property(type="integer")
      */
     private ?int $id = null;
 
@@ -28,6 +32,7 @@ class Product
      * @ORM\Column(type="string", length=255)
      * @Groups({"product"})
      * @var string|null
+     * @OA\Property(type="string", nullable=true)
      */
     private ?string $name = null;
 
@@ -35,6 +40,7 @@ class Product
      * @ORM\Column(type="text")
      * @Groups({"product"})
      * @var string|null
+     * @OA\Property(type="string", nullable=true)
      */
     private ?string $description = null;
 
@@ -42,6 +48,7 @@ class Product
      * @ORM\Column(type="string", length=255)
      * @Groups({"product"})
      * @var string|null
+     * @OA\Property(type="string", nullable=true)
      */
     private ?string $price = null;
 
@@ -50,11 +57,13 @@ class Product
      * @Gedmo\Timestampable(on="create")
      * @Groups({"product"})
      * @var DateTimeInterface|null
+     * @OA\Property(type="string", format="date-time", nullable=true)
      */
     private ?DateTimeInterface $createdAt = null;
 
     /**
      * @ORM\ManyToMany(targetEntity=Client::class, inversedBy="products")
+     * @OA\Property(type="string")
      */
     private Collection $clients;
 
