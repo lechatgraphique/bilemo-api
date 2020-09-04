@@ -1,8 +1,6 @@
 # P7-BileMo API
 
-Work in progress ...
-
-Création d'une API Rest pour BileMo, une entreprise de vente de téléphone.
+Création d'une API Rest BileMo, une entreprise de vente de téléphone.
 
 ## Environnement utilisé durant le développement
 * Symfony 5
@@ -41,6 +39,10 @@ php bin/console doctrine:fixtures:load
 Lancez l'environnement d'exécution Apache / Php en utilisant:
 ```
 php bin/console server:run
+```
+## Documentation API - Swagger
+```
+https://localhost:8000/swagger/
 ```
 ## Crédits d'utilisateur par défaut
 ```
