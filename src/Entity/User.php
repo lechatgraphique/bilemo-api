@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Annotations as OA;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -26,8 +27,8 @@ class User
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"user"})
-     * @var string|null
-     * @OA\Property(type="string", nullable=true)
+     * @OA\Property(type="string")
+     * @Assert\NotBlank(groups={"user"}, message="Vous devez saisir un nom d'utilisateur.")
      */
     private ?string $username = null;
 
@@ -35,13 +36,14 @@ class User
      * @ORM\Column(type="string", length=255)
      * @Groups({"user"})
      * @var string|null
-     * @OA\Property(type="string", nullable=true)
+     * @OA\Property(type="string")
+     * @Assert\Email(groups={"user"}, message="Le format de l'adresse n'est pas correcte.")
      */
     private ?string $email = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
-     * @OA\Property(type="string", nullable=true)
+     * @OA\Property(type="string")
      *
      */
     private ?Client $client = null;
