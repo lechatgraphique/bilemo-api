@@ -6,12 +6,15 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserController extends AbstractController
@@ -20,6 +23,9 @@ class UserController extends AbstractController
      * @Rest\Get(path="/api/users", name="api_users")
      * @Rest\View(statusCode= 200, serializerGroups={"user"})
      * @param UserRepository $userRepository
+     * @param CacheInterface $cache
+     * @return User[]
+     * @throws InvalidArgumentException
      * @OA\Get(
      *     path="/users",
      *     security={"bearer"},
@@ -31,11 +37,14 @@ class UserController extends AbstractController
      *     @OA\Response(response=404, description="La ressource n'existe pas"),
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
-     * @return User[]
      */
-    public function users(UserRepository $userRepository)
+    public function users(UserRepository $userRepository, CacheInterface $cache)
     {
-        return $userRepository->findAll();
+        return $cache->get('users',
+            function (ItemInterface $item) use ($userRepository) {
+                $item->expiresAfter(3600);
+                return $userRepository->findAll();
+            });
     }
 
     /**
@@ -65,7 +74,12 @@ class UserController extends AbstractController
      */
     public function show(User $user, UserRepository $userRepository)
     {
-        return $userRepository->find($user);
+        return $cache->get('user',
+            function (ItemInterface $item) use ($user, $userRepository) {
+                $item->expiresAfter(3600);
+                return $userRepository->find($user);
+            });
+
     }
 
     /**

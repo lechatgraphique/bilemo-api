@@ -5,8 +5,11 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Repository\ProductRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use OpenApi\Annotations as OA;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class ProductController extends AbstractController
 {
@@ -25,15 +28,20 @@ class ProductController extends AbstractController
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
      * @param ProductRepository $productRepository
-     * @return Product[]
+     * @param CacheInterface $cache
+     * @return void
+     * @throws InvalidArgumentException
      */
-    public function products(ProductRepository $productRepository)
+    public function products(ProductRepository $productRepository, CacheInterface $cache)
     {
-        return $productRepository->findAll();
+        return $cache->get('products',
+            function (ItemInterface $item) use ($productRepository) {
+                $item->expiresAfter(3600);
+                return $productRepository->findAll();
+            });
     }
 
     /**
-
      * @Rest\Get(path="/api/products/{id}", name="api_show_product")
      * @Rest\View(statusCode= 200, serializerGroups={"product"})
      * @OA\Get(
@@ -54,11 +62,18 @@ class ProductController extends AbstractController
      *     @OA\Response(response=404, description="La ressource n'existe pas"),
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
+     * @param $id
      * @param Product $product
+     * @param CacheInterface $cache
      * @return string
+     * @throws InvalidArgumentException
      */
-    public function show(Product $product)
+    public function show($id, Product $product, CacheInterface $cache)
     {
-        return $product;
+        return $cache->get('product'. $id,
+            function (ItemInterface $item) use ($product) {
+                $item->expiresAfter(3600);
+                return $product;
+            });
     }
 }
