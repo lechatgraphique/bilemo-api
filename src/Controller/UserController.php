@@ -52,6 +52,9 @@ class UserController extends AbstractController
      * @Rest\View(statusCode= 200, serializerGroups={"user"})
      * @param User $user
      * @param UserRepository $userRepository
+     * @param CacheInterface $cache
+     * @return string
+     * @throws InvalidArgumentException
      * @OA\Get(
      *     path="/users/{id}",
      *     security={"bearer"},
@@ -70,9 +73,8 @@ class UserController extends AbstractController
      *     @OA\Response(response=404, description="La ressource n'existe pas"),
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
-     * @return string
      */
-    public function show(User $user, UserRepository $userRepository)
+    public function show(User $user, UserRepository $userRepository, CacheInterface $cache)
     {
         return $cache->get('user',
             function (ItemInterface $item) use ($user, $userRepository) {
