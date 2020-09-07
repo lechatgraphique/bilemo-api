@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,8 @@ class UserController extends AbstractController
      * @Rest\View(statusCode= 200, serializerGroups={"user"})
      * @param UserRepository $userRepository
      * @param CacheInterface $cache
+     * @param PaginatorInterface $paginator
+     * @param Request $request
      * @return User[]
      * @throws InvalidArgumentException
      * @OA\Get(
@@ -38,13 +41,23 @@ class UserController extends AbstractController
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
      */
-    public function users(UserRepository $userRepository, CacheInterface $cache)
+    public function users(
+        UserRepository $userRepository,
+        CacheInterface $cache,
+        PaginatorInterface $paginator,
+        Request $request
+    )
     {
-        return $cache->get('users',
-            function (ItemInterface $item) use ($userRepository) {
+        $page = $request->query->getInt('page', 1);
+
+        return $cache->get('products' . $page,
+            function (ItemInterface $item) use ($paginator, $page, $userRepository) {
                 $item->expiresAfter(3600);
-                return $userRepository->findAll();
-            });
+
+                $data = $userRepository->findAll();
+
+                return $paginator->paginate($data, $page, 4);
+            }); 
     }
 
     /**
@@ -81,7 +94,6 @@ class UserController extends AbstractController
                 $item->expiresAfter(3600);
                 return $userRepository->find($user);
             });
-
     }
 
     /**
