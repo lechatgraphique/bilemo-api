@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Repository\ProductRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -29,15 +31,27 @@ class ProductController extends AbstractController
      * )
      * @param ProductRepository $productRepository
      * @param CacheInterface $cache
+     * @param Request $request
+     * @param PaginatorInterface $paginator
      * @return void
      * @throws InvalidArgumentException
      */
-    public function products(ProductRepository $productRepository, CacheInterface $cache)
+    public function products(
+        ProductRepository $productRepository,
+        CacheInterface $cache,
+        Request $request,
+        PaginatorInterface $paginator
+    )
     {
-        return $cache->get('products',
-            function (ItemInterface $item) use ($productRepository) {
+        $page = $request->query->getInt('page', 1);
+
+        return $cache->get('products' . $page,
+            function (ItemInterface $item) use ($paginator, $page, $productRepository) {
                 $item->expiresAfter(3600);
-                return $productRepository->findAll();
+
+                $data = $productRepository->findAll();
+
+                return $paginator->paginate($data, $page, 4);
             });
     }
 
