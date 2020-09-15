@@ -1,3 +1,5 @@
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1569282481be4b359cb2c9b4ef33aab0)](https://www.codacy.com/manual/lechatgraphique/bilemo-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lechatgraphique/bilemo-api&amp;utm_campaign=Badge_Grade)
+
 # P7-BileMo API
 
 Création d'une API Rest BileMo, une entreprise de vente de téléphone.
