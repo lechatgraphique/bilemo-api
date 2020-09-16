@@ -14,9 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class UserController extends AbstractController
 {
@@ -24,7 +24,7 @@ class UserController extends AbstractController
      * @Rest\Get(path="/api/users", name="api_users")
      * @Rest\View(statusCode= 200, serializerGroups={"user"})
      * @param UserRepository $userRepository
-     * @param CacheInterface $cache
+     * @param TagAwareCacheInterface $cache
      * @param PaginatorInterface $paginator
      * @param Request $request
      * @return User[]
@@ -43,7 +43,7 @@ class UserController extends AbstractController
      */
     public function users(
         UserRepository $userRepository,
-        CacheInterface $cache,
+        TagAwareCacheInterface $cache,
         PaginatorInterface $paginator,
         Request $request
     )
@@ -53,11 +53,12 @@ class UserController extends AbstractController
         return $cache->get('users' . $page,
             function (ItemInterface $item) use ($paginator, $page, $userRepository) {
                 $item->expiresAfter(3600);
+                $item->tag('user');
 
                 $data = $userRepository->findAll();
 
                 return $paginator->paginate($data, $page, 4);
-            }); 
+            });
     }
 
     /**
@@ -65,7 +66,7 @@ class UserController extends AbstractController
      * @Rest\View(statusCode= 200, serializerGroups={"user"})
      * @param User $user
      * @param UserRepository $userRepository
-     * @param CacheInterface $cache
+     * @param TagAwareCacheInterface $cache
      * @return string
      * @throws InvalidArgumentException
      * @OA\Get(
@@ -87,9 +88,9 @@ class UserController extends AbstractController
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
      */
-    public function show(User $user, UserRepository $userRepository, CacheInterface $cache)
+    public function show(User $user, UserRepository $userRepository, TagAwareCacheInterface $cache)
     {
-        return $cache->get('user',
+        return $cache->get('users',
             function (ItemInterface $item) use ($user, $userRepository) {
                 $item->expiresAfter(3600);
                 return $userRepository->find($user);
@@ -104,7 +105,9 @@ class UserController extends AbstractController
      * @param EntityManagerInterface $em
      * @param Security $security
      * @param ValidatorInterface $validator
+     * @param TagAwareCacheInterface $cache
      * @return array|object
+     * @throws InvalidArgumentException
      * @OA\Post(
      *     path="/users",
      *     security={"bearer"},
@@ -122,8 +125,11 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $em,
         Security $security,
-        ValidatorInterface $validator)
+        ValidatorInterface $validator,
+        TagAwareCacheInterface $cache)
     {
+        $cache->invalidateTags(['user']);
+
         $json = $request->getContent();
 
         $user = $serializer->deserialize($json, User::class, 'json', ['groups' => 'user']);
@@ -150,6 +156,9 @@ class UserController extends AbstractController
      * @Rest\View(statusCode= 200)
      * @param User $user
      * @param EntityManagerInterface $em
+     * @param TagAwareCacheInterface $cache
+     * @return void
+     * @throws InvalidArgumentException
      * @OA\Delete (
      *     path="/users",
      *     security={"bearer"},
@@ -161,11 +170,12 @@ class UserController extends AbstractController
      *     @OA\Response(response=404, description="La ressource n'existe pas"),
      *     @OA\Response(response=401, description="Jeton authentifié échoué / invalide")
      * )
-     * @return void
      */
-    public function delete(User $user, EntityManagerInterface $em)
+    public function delete(User $user, EntityManagerInterface $em, TagAwareCacheInterface $cache)
     {
         $em->remove($user);
         $em->flush();
+
+        $cache->invalidateTags(['user']);
     }
 }
