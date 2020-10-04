@@ -56,7 +56,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Rest\Get(path="/api/products/{id}", name="api_show_products")
+     * @Rest\Get(path="/api/products/{id}", name="api_show_product")
      * @Rest\View(statusCode= 200, serializerGroups={"product"})
      * @OA\Get(
      *     path="/products/{id}",
